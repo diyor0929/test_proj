@@ -1,0 +1,38 @@
+name: Deploy app to server
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: change directory to my-nodeapp
+        run: cd my-nodeapp
+
+      - name: npm install packages 
+        run: npm ci
+
+      
+      - name: Copy file via SSH 
+        uses: appleboy/scp-action@v1
+        with: 
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "."
+          target: /opt/test_proj/my-nodeapp 
+
+      - name: Exxecute remote ssh comand using password
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: systemctl restart my-nodeapp
+
