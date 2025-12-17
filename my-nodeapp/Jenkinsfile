@@ -3,7 +3,7 @@ pipeline{
     stages{
         stage('checkout code'){
             steps{
-                git https://github.com/diyor0929/test_proj
+                git url:  'https://github.com/diyor0929/test_proj'
             }
         }
         stage('build'){
