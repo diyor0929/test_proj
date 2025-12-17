@@ -18,7 +18,7 @@ pipeline {
 
         stage('Docker Login') {
             steps {
-                withCredentials([string(credentialsId: 'do-registry-creds', variable: 'DO_TOKEN')]) {
+                withCredentials([string(credentialsId: 'digitalocean', variable: 'DO_TOKEN')]) {
                     sh '''
                       echo "$DO_TOKEN" | docker login $REGISTRY \
                       -u oromovjavoxir@gmail.com --password-stdin
