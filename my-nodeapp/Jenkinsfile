@@ -1,19 +1,25 @@
 pipeline{
     agent any
     stages{
-        stage('Build '){
+        stage('checkout code'){
             steps{
-                echo 'Building the app '
-            }}
+                git https://github.com/diyor0929/test_proj
+            }
+        }
+        stage('build'){
+            steps{
+                sh ' echo " Building the app" '
+            }
+        }
         stage('Test'){
             steps{
-                echo 'Running the test'
-            }}
-        stage('Deploy'){
+                sh ' echo "running test" '
+            }
+        }
+        stages('Deploy'){
             steps{
-                echo 'Deploy the app'
-        
-        }}
-        
+                sh ' echo "Deploying" '
+            }
+        }
     }
 }
