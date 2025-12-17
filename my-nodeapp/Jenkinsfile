@@ -17,15 +17,16 @@ pipeline {
         }
 
         stage('Docker Login') {
-            steps {
-                withCredentials([string(credentialsId: 'digitalocean', variable: 'DO_TOKEN')]) {
-                    sh '''
-                      echo "$DO_TOKEN" | docker login $REGISTRY \
-                      -u oromovjavoxir@gmail.com --password-stdin
-                    '''
-                }
-            }
+    steps {
+        withCredentials([string(credentialsId: 'digitalocean-token', variable: 'DO_TOKEN')]) {
+            sh '''
+              echo "$DO_TOKEN" | docker login $REGISTRY \
+              -u oromovjavoxir@gmail.com --password-stdin
+            '''
         }
+    }
+}
+
 
         stage('Push Docker Image') {
             steps {
