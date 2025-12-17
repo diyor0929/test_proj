@@ -1,24 +1,58 @@
 pipeline {
     agent any
 
+    environment {
+        REGISTRY   = "registry.digitalocean.com/my-container-registry123"
+        IMAGE_NAME = "test_app"
+        TAG        = "${BUILD_NUMBER}"
+        CREDS      = "do-registry-creds"
+    }
+
     stages {
-        stage('Build') {
+
+        stage('Checkout') {
             steps {
-                sh 'echo "Building the app"'
+                git branch: 'main',
+                    url: 'https://github.com/diyor0929/test_proj',
+                    credentialsId: 'github-credentials'
             }
         }
 
-        stage('Test') {
+        stage('Docker Login') {
             steps {
-                sh 'echo "Running tests"'
+                withCredentials([usernamePassword(
+                    credentialsId: CREDS,
+                    usernameVariable: 'DO_USER',
+                    passwordVariable: 'DO_TOKEN'
+                )]) {
+                    sh """
+                        echo "$DO_TOKEN" | docker login $REGISTRY \
+                        -u $DO_USER --password-stdin
+                    """
+                }
             }
         }
 
-        stage('Deploy') {
+        stage('Build Docker Image') {
             steps {
-                sh 'echo "Deploying the app"'
+                sh """
+                    docker build -t $REGISTRY/$IMAGE_NAME:$TAG .
+                """
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh """
+                    docker push $REGISTRY/$IMAGE_NAME:$TAG
+                """
             }
         }
     }
-}
 
+    post {
+        always {
+            sh 'docker logout $REGISTRY || true'
+        }
+    }
+}
