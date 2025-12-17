@@ -2,57 +2,44 @@ pipeline {
     agent any
 
     environment {
-        REGISTRY   = "registry.digitalocean.com/my-container-registry123"
-        IMAGE_NAME = "test_app"
-        TAG        = "${BUILD_NUMBER}"
-        CREDS      = "do-registry-creds"
+        REGISTRY = "registry.digitalocean.com/my-container-registry123"
+        IMAGE    = "my-nodeapp"
+        TAG      = "${BUILD_NUMBER}"
     }
 
     stages {
-
-        stage('Checkout') {
+        stage('Build Docker Image') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/diyor0929/test_proj',
-                    credentialsId: 'github-credentials'
+                sh '''
+                  docker build -t $REGISTRY/$IMAGE:$TAG .
+                '''
             }
         }
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: CREDS,
-                    usernameVariable: 'DO_USER',
-                    passwordVariable: 'DO_TOKEN'
-                )]) {
-                    sh """
-                        echo "$DO_TOKEN" | docker login $REGISTRY \
-                        -u $DO_USER --password-stdin
-                    """
+                withCredentials([string(credentialsId: 'do-registry-creds', variable: 'DO_TOKEN')]) {
+                    sh '''
+                      echo "$DO_TOKEN" | docker login $REGISTRY \
+                      -u oromovjavoxir@gmail.com --password-stdin
+                    '''
                 }
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh """
-                    docker build -t $REGISTRY/$IMAGE_NAME:$TAG .
-                """
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh """
-                    docker push $REGISTRY/$IMAGE_NAME:$TAG
-                """
+                sh '''
+                  docker push $REGISTRY/$IMAGE:$TAG
+                '''
             }
         }
     }
 
     post {
         always {
-            sh 'docker logout $REGISTRY || true'
+            sh 'docker logout $REGISTRY'
         }
     }
 }
+
