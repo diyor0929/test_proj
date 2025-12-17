@@ -1,25 +1,30 @@
-pipeline{
+pipeline {
     agent any
-    stages{
-        stage('checkout code'){
-            steps{
-                git url:  'https://github.com/diyor0929/test_proj'
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git url: 'https://github.com/diyor0929/test_proj.git'
             }
         }
-        stage('build'){
-            steps{
-                sh ' echo " Building the app" '
+
+        stage('Build') {
+            steps {
+                sh 'echo "Building the app"'
             }
         }
-        stage('Test'){
-            steps{
-                sh ' echo "running test" '
+
+        stage('Test') {
+            steps {
+                sh 'echo "Running tests"'
             }
         }
-        stages('Deploy'){
-            steps{
-                sh ' echo "Deploying" '
+
+        stage('Deploy') {
+            steps {
+                sh 'echo "Deploying the app"'
             }
         }
     }
 }
+
