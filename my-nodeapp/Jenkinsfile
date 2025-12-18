@@ -46,6 +46,8 @@ pipeline {
                 sshagent(['droplet-ssh-key']) {
                     sh """ 
                         ssh -o StrictHostKeyChecking=no $SERVER "
+                            echo $DO_TOKEN | docker login $REGISTRY -u <oromovjavoxir@gmail.com
+                            > --password-stdin &&
                             cd $APP_DIR && 
                             docker compose pull &&
                             docker compose up -d 
