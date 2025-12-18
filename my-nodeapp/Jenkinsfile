@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         REGISTRY = "registry.digitalocean.com/my-container-registry123"
-        IMAGE    = "my-nodeapp"
+        IMAGE_NAME   = "my-nodeapp"
         TAG      = "${BUILD_NUMBER}"
         CREDS    = "do-registry-creds"
         SERVER   = "root@104.248.86.154"
@@ -14,7 +14,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''   
-                  docker build -t $REGISTRY/$IMAGE:$TAG my-nodeapp
+                  docker build -t $REGISTRY/$IMAGE_NAME:$TAG my-nodeapp
                 '''
             }
         }
@@ -34,8 +34,9 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 sh '''
-                  docker push $REGISTRY/$IMAGE:$TAG
+                  docker push $REGISTRY/$IMAGE_NAME:$TAG
                   docker tag $REGISTRY/$IMAGE_NAME:$TAG $REGISTRY/IMAGE_NAME:latest
+                   docker push $REGISTRY/$IMAGE_NAME:latest
                 '''
             }
         }
