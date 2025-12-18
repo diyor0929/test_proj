@@ -5,12 +5,15 @@ pipeline {
         REGISTRY = "registry.digitalocean.com/my-container-registry123"
         IMAGE    = "my-nodeapp"
         TAG      = "${BUILD_NUMBER}"
+        CREDS    = "do-registry-creds"
+        SERVER   = "root@104.248.86.154"
+        APP_DIR  = "/opt/my-nodeapp"
     }
 
     stages {
         stage('Build Docker Image') {
             steps {
-                sh '''
+                sh '''   
                   docker build -t $REGISTRY/$IMAGE:$TAG my-nodeapp
                 '''
             }
@@ -32,7 +35,21 @@ pipeline {
             steps {
                 sh '''
                   docker push $REGISTRY/$IMAGE:$TAG
+                  docker tag $REGISTRY/$IMAGE_NAME:$TAG $REGISTRY/IMAGE_NAME:latest
                 '''
+            }
+        }
+        stage('Deploy with docker compose'){
+            steps{
+                sshagent(['droplet-ssh-key']) {
+                    sh """ 
+                        ssh -o StrictHostKeyChecking=no SERVER '
+                            cd APP_DIR && 
+                            docker compose pull &&
+                            docker compose up -d 
+                        '
+                    """
+                }
             }
         }
     }
