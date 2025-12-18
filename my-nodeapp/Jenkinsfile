@@ -45,11 +45,11 @@ pipeline {
             steps{
                 sshagent(['droplet-ssh-key']) {
                     sh """ 
-                        ssh -o StrictHostKeyChecking=no SERVER '
-                            cd APP_DIR && 
+                        ssh -o StrictHostKeyChecking=no $SERVER "
+                            cd $APP_DIR && 
                             docker compose pull &&
                             docker compose up -d 
-                        '
+                        "
                     """
                 }
             }
